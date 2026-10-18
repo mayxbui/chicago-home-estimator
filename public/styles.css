@@ -1387,3 +1387,157 @@ summary:focus-visible {
   font-weight: 600;
   letter-spacing: .06em;
 }
+
+/* Round action buttons consistently, retaining circular icon controls. */
+button, .button, .secondary, .hero .button { border-radius: 999px; }
+.search-dropdown {
+  position: relative;
+  display: block;
+  margin-top: 7px;
+}
+.search-dropdown input {
+  margin-top: 0;
+  padding-right: 48px;
+  width: 100%;
+  min-height: 48px;
+  appearance: none;
+}
+.dropdown-toggle {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #745037;
+  font-size: 23px;
+  cursor: pointer;
+}
+.dropdown-toggle:hover { background: #b8956d20; }
+.dropdown-options {
+  position: fixed;
+  z-index: 100;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid #ffffffa0;
+  border-radius: 14px;
+  background: #f8efdfed;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 32px #60432626;
+  color: #382619;
+  font: 14px/1.5 'IBM Plex Sans JP', sans-serif;
+}
+.dropdown-options li {
+  padding: 11px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.dropdown-options li:hover,
+.dropdown-options li[aria-selected=true] { background: #b9956d2e; }
+.dropdown-options .dropdown-empty { color: #75614f; cursor: default; }
+
+/* A vector chevron stays centered regardless of font metrics. */
+.dropdown-toggle { line-height: 1; }
+.dropdown-toggle svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  transition: transform .18s ease;
+}
+.dropdown-toggle[aria-expanded=true] svg { transform: rotate(180deg); }
+
+/* Espresso feature panels give the lighter glass surfaces a visual anchor. */
+.hero-card,
+.estimate-card,
+.form-aside {
+  background:
+    radial-gradient(ellipse at 100% 0%, #dcad7340, transparent 65%),
+    linear-gradient(135deg, #5a3b2cdb, #2f211bd9);
+  color: #fff0df;
+  border: 1px solid #e3c29a45;
+  box-shadow: 0 18px 45px #50331f24, inset 0 1px 0 #ffe7c72b;
+}
+.hero-card .eyebrow,
+.hero-card .step b,
+.form-aside .eyebrow { color: #eac496; }
+.hero-card .step { border-color: #edd1ad26; }
+.hero-card .step p,
+.form-aside p,
+.form-aside .muted { color: #e2cdb6; }
+.form-aside h2,
+.form-aside strong { color: #fff1df; }
+.form-aside hr { border-color: #e7cba72e; }
+.form-aside .button {
+  background: linear-gradient(135deg, #edcfaa, #d3af83);
+  color: #3d281c;
+  border-color: #fff1d94d;
+}
+.form-aside .button:hover { background: linear-gradient(135deg, #f5debd, #dfbe95); }
+.hero-visual { border-color: #e6c59f38; }
+/* One market metric echoes the feature panels without darkening the whole page. */
+#market-metrics > .card:first-child {
+  background:
+    radial-gradient(ellipse at 100% 0%, #d4a46738, transparent 70%),
+    linear-gradient(130deg, #5b3d2ee0, #35251edb);
+  color: #fff0df;
+  border-color: #e3c29a40;
+  box-shadow: 0 12px 35px #50331f20, inset 0 1px 0 #ffe7c720;
+}
+#market-metrics > .card:first-child .muted { color: #dfc8ad; }
+@supports not (backdrop-filter: blur(12px)) {
+  .hero-card, .estimate-card, .form-aside,
+  #market-metrics > .card:first-child { background-color: #443025; }
+}
+
+/* Espresso glass carries through the accuracy metrics and data-source cards. */
+#about #accuracy > .card,
+#about > .grid.three > .card {
+  background:
+    radial-gradient(ellipse at 100% 0%, #dcad7340, transparent 65%),
+    linear-gradient(135deg, #5a3b2cdb, #2f211bd9);
+  color: #fff0df;
+  border: 1px solid #e3c29a45;
+  box-shadow: 0 18px 45px #50331f24, inset 0 1px 0 #ffe7c72b;
+}
+#about #accuracy > .card .muted,
+#about > .grid.three > .card p { color: #e2cdb6; }
+#about > .grid.three > .card a { color: #f2d1a5; }
+#about > .grid.three > .card a:hover { color: #fff2df; }
+#about #accuracy > .card:hover,
+#about > .grid.three > .card:hover {
+  border-color: #edcba86b;
+  box-shadow: 0 20px 45px #50331f30, inset 0 1px 0 #ffe7c738;
+}
+
+/* Translucent espresso tint lets the ambient light show through accent cards. */
+.hero-card,
+.estimate-card,
+.form-aside,
+#market-metrics > .card:first-child,
+#about #accuracy > .card,
+#about > .grid.three > .card {
+  background:
+    radial-gradient(ellipse at 100% 0%, #dcad7326, transparent 65%),
+    linear-gradient(135deg, #503224b8, #2c1d16b3);
+  border-color: #e3c29a30;
+  box-shadow: 0 16px 40px #50331f1c, inset 0 1px 0 #ffe7c720;
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+}
+@supports not (backdrop-filter: blur(16px)) {
+  .hero-card, .estimate-card, .form-aside,
+  #market-metrics > .card:first-child,
+  #about #accuracy > .card,
+  #about > .grid.three > .card { background-color: #443025; }
+}

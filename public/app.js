@@ -418,3 +418,158 @@ document.addEventListener('pointerdown', event => {
     setContactOpen(false);
   }
 });
+
+// Replace inconsistent native suggestion popups with searchable, keyboard-friendly lists.
+function setupSearchDropdown(inputId, sourceId, emptyLabel) {
+  const input = $(inputId);
+  const source = $(sourceId);
+  input.removeAttribute('list');
+  const shell = document.createElement('span');
+  shell.className = 'search-dropdown';
+  input.parentNode.insertBefore(shell, input);
+  shell.append(input);
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'dropdown-toggle';
+  const chevron = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  chevron.setAttribute('viewBox', '0 0 24 24');
+  chevron.setAttribute('aria-hidden', 'true');
+  chevron.setAttribute('fill', 'none');
+  const chevronPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  chevronPath.setAttribute('d', 'm7 10 5 5 5-5');
+  chevronPath.setAttribute('stroke', 'currentColor');
+  chevronPath.setAttribute('stroke-width', '1.7');
+  chevronPath.setAttribute('stroke-linecap', 'round');
+  chevronPath.setAttribute('stroke-linejoin', 'round');
+  chevron.append(chevronPath);
+  toggle.append(chevron);
+  toggle.setAttribute('aria-label', 'Show ' + inputId.replaceAll('-', ' ') + ' choices');
+  const popup = document.createElement('ul');
+  popup.id = inputId + '-popup';
+  popup.className = 'dropdown-options';
+  popup.setAttribute('role', 'listbox');
+  popup.setAttribute('aria-label', inputId.replaceAll('-', ' ') + ' choices');
+  popup.hidden = true;
+  document.body.append(popup);
+  shell.append(toggle);
+  input.setAttribute('role', 'combobox');
+  input.setAttribute('aria-autocomplete', 'list');
+  input.setAttribute('aria-expanded', 'false');
+  input.setAttribute('aria-controls', popup.id);
+  toggle.setAttribute('aria-controls', popup.id);
+  toggle.setAttribute('aria-expanded', 'false');
+  let choices = [];
+  let active = -1;
+
+  // Place the popup above other glass layers, opening upward if space is limited.
+  function position() {
+    const bounds = shell.getBoundingClientRect();
+    const below = window.innerHeight - bounds.bottom - 12;
+    const above = bounds.top - 12;
+    const upwards = below < 200 && above > below;
+    popup.style.left = Math.max(8, bounds.left) + 'px';
+    popup.style.width = Math.min(bounds.width, window.innerWidth - 16) + 'px';
+    popup.style.maxHeight = Math.max(90, Math.min(280, upwards ? above : below)) + 'px';
+    popup.style.top = upwards ? 'auto' : bounds.bottom + 6 + 'px';
+    popup.style.bottom = upwards ? window.innerHeight - bounds.top + 6 + 'px' : 'auto';
+  }
+
+  // Close the popup while preserving the user's typed or selected value.
+  function close() {
+    popup.hidden = true;
+    input.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-expanded', 'false');
+    input.removeAttribute('aria-activedescendant');
+  }
+
+  // Commit a supported choice and notify existing ZIP and class validation handlers.
+  function choose(value) {
+    input.value = value;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    close();
+    input.focus({ preventScroll: true });
+  }
+
+  // Highlight a choice for arrow-key navigation without changing the form value.
+  function highlight(index) {
+    active = index;
+    Array.from(popup.children).forEach((item, i) => {
+      item.setAttribute('aria-selected', String(i === active));
+    });
+    const selected = popup.children[active];
+    if (selected) {
+      input.setAttribute('aria-activedescendant', selected.id);
+      selected.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  // Show every choice on click, then filter by code or description while typing.
+  function open(filter = '') {
+    const query = filter.trim().toLowerCase();
+    choices = Array.from(source.options).map(item => ({ value: item.value, label: item.label || item.value }));
+    if (emptyLabel) choices.unshift({ value: '', label: emptyLabel });
+    choices = choices.filter(item => (item.value + ' ' + item.label).toLowerCase().includes(query));
+    popup.replaceChildren();
+    active = -1;
+    input.removeAttribute('aria-activedescendant');
+    choices.forEach((choice, index) => {
+      const item = document.createElement('li');
+      item.id = popup.id + '-' + index;
+      item.setAttribute('role', 'option');
+      item.setAttribute('aria-selected', 'false');
+      item.textContent = choice.label;
+      item.addEventListener('pointerdown', event => event.preventDefault());
+      item.addEventListener('click', () => choose(choice.value));
+      popup.append(item);
+    });
+    if (!choices.length) {
+      const message = document.createElement('li');
+      message.className = 'dropdown-empty';
+      message.textContent = inputId === 'neighborhood' ? 'No matches. Check the ZIP or leave this blank.' : 'No matching choices. Try another code.';
+      popup.append(message);
+    }
+    popup.hidden = false;
+    input.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-expanded', 'true');
+    position();
+  }
+
+  input.addEventListener('click', () => open());
+  input.addEventListener('input', () => open(input.value));
+  toggle.addEventListener('pointerdown', event => event.preventDefault());
+  toggle.addEventListener('click', event => {
+    event.preventDefault();
+    if (popup.hidden) { input.focus(); open(); }
+    else close();
+  });
+  input.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { close(); return; }
+    if (event.key === 'Tab') { close(); return; }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (popup.hidden) open();
+      if (choices.length) highlight((active + (event.key === 'ArrowDown' ? 1 : -1) + choices.length) % choices.length);
+    }
+    if (event.key === 'Enter' && !popup.hidden) {
+      event.preventDefault();
+      if (active >= 0 && choices[active]) choose(choices[active].value);
+      else if (choices.length === 1) choose(choices[0].value);
+      else close();
+    }
+  });
+  input.addEventListener('blur', close);
+  document.addEventListener('pointerdown', event => {
+    if (!shell.contains(event.target) && !popup.contains(event.target)) close();
+  });
+  window.addEventListener('resize', close);
+  window.addEventListener('scroll', event => {
+    if (!popup.contains(event.target)) close();
+  }, true);
+}
+
+setupSearchDropdown('zip', 'zip-options');
+setupSearchDropdown('neighborhood', 'neighborhood-options', 'Not provided');
+setupSearchDropdown('property-class', 'class-options');
+setupSearchDropdown('market-zip', 'market-zip-options', 'All available ZIPs');
