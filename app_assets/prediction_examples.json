@@ -1,0 +1,170 @@
+[
+  {
+    "inputs": {
+      "ZIP Code": "60609",
+      "Property Class": "206",
+      "Valuation Date": "2019-11-26",
+      "Building Area (sq ft)": 2385.0,
+      "Land Area (sq ft)": 3900.0,
+      "Bedrooms": 4,
+      "Full Bathrooms": 2,
+      "Half Bathrooms": 0,
+      "Year Built": 1903
+    },
+    "expected_price_USD": 281684.0226952312
+  },
+  {
+    "inputs": {
+      "ZIP Code": "60605",
+      "Property Class": "295",
+      "Valuation Date": "2019-12-06",
+      "Building Area (sq ft)": 1448.0,
+      "Land Area (sq ft)": 964.0,
+      "Bedrooms": 2,
+      "Full Bathrooms": 2,
+      "Half Bathrooms": 0,
+      "Year Built": 1990
+    },
+    "expected_price_USD": 466865.9545733413
+  },
+  {
+    "inputs": {
+      "ZIP Code": "60619",
+      "Property Class": "295",
+      "Valuation Date": "2020-10-20",
+      "Building Area (sq ft)": 888.0,
+      "Land Area (sq ft)": 1076.0,
+      "Bedrooms": 2,
+      "Full Bathrooms": 1,
+      "Half Bathrooms": 0,
+      "Year Built": 1965
+    },
+    "expected_price_USD": 66240.20727497479
+  },
+  {
+    "inputs": {
+      "ZIP Code": "60619",
+      "Property Class": "204",
+      "Valuation Date": "2020-08-28",
+      "Building Area (sq ft)": 1960.0,
+      "Land Area (sq ft)": 5346.0,
+      "Bedrooms": 3,
+      "Full Bathrooms": 1,
+      "Half Bathrooms": 1,
+      "Year Built": 1941
+    },
+    "expected_price_USD": 166386.2815799123
+  },
+  {
+    "inputs": {
+      "ZIP Code": "60628",
+      "Property Class": "202",
+      "Valuation Date": "2020-08-20",
+      "Building Area (sq ft)": 893.0,
+      "Land Area (sq ft)": 4290.0,
+      "Bedrooms": 2,
+      "Full Bathrooms": 1,
+      "Half Bathrooms": 1,
+      "Year Built": 1952
+    },
+    "expected_price_USD": 103237.94594218797
+  },
+  {
+    "inputs": {
+      "ZIP Code": "60619",
+      "Property Class": "203",
+      "Valuation Date": "2020-10-08",
+      "Building Area (sq ft)": 1649.0,
+      "Land Area (sq ft)": 4830.0,
+      "Bedrooms": 3,
+      "Full Bathrooms": 1,
+      "Half Bathrooms": 0,
+      "Year Built": 1940
+    },
+    "expected_price_USD": 149570.92487673863
+  },
+  {
+    "inputs": {
+      "ZIP Code": "60617",
+      "Property Class": "203",
+      "Valuation Date": "2020-08-27",
+      "Building Area (sq ft)": 1056.0,
+      "Land Area (sq ft)": 4225.0,
+      "Bedrooms": 3,
+      "Full Bathrooms": 1,
+      "Half Bathrooms": 0,
+      "Year Built": 1959
+    },
+    "expected_price_USD": 131604.45708113542
+  },
+  {
+    "inputs": {
+      "ZIP Code": "60617",
+      "Property Class": "205",
+      "Valuation Date": "2020-10-01",
+      "Building Area (sq ft)": 1235.0,
+      "Land Area (sq ft)": 3906.0,
+      "Bedrooms": 3,
+      "Full Bathrooms": 1,
+      "Half Bathrooms": 0,
+      "Year Built": 1948
+    },
+    "expected_price_USD": 127162.4858896925
+  },
+  {
+    "inputs": {
+      "ZIP Code": "60653",
+      "Property Class": "278",
+      "Valuation Date": "2020-09-29",
+      "Building Area (sq ft)": 2410.0,
+      "Land Area (sq ft)": 5600.0,
+      "Bedrooms": 4,
+      "Full Bathrooms": 2,
+      "Half Bathrooms": 2,
+      "Year Built": 1998
+    },
+    "expected_price_USD": 619922.2156093519
+  },
+  {
+    "inputs": {
+      "ZIP Code": "60619",
+      "Property Class": "205",
+      "Valuation Date": "2020-07-20",
+      "Building Area (sq ft)": 1260.0,
+      "Land Area (sq ft)": 3150.0,
+      "Bedrooms": 3,
+      "Full Bathrooms": 1,
+      "Half Bathrooms": 0,
+      "Year Built": 1907
+    },
+    "expected_price_USD": 107686.09596336265
+  },
+  {
+    "inputs": {
+      "ZIP Code": "60617",
+      "Property Class": "203",
+      "Valuation Date": "2020-03-11",
+      "Building Area (sq ft)": 1065.0,
+      "Land Area (sq ft)": 3750.0,
+      "Bedrooms": 3,
+      "Full Bathrooms": 1,
+      "Half Bathrooms": 0,
+      "Year Built": 1954
+    },
+    "expected_price_USD": 121031.37046685524
+  },
+  {
+    "inputs": {
+      "ZIP Code": "60649",
+      "Property Class": "203",
+      "Valuation Date": "2020-07-08",
+      "Building Area (sq ft)": 1075.0,
+      "Land Area (sq ft)": 3430.0,
+      "Bedrooms": 3,
+      "Full Bathrooms": 1,
+      "Half Bathrooms": 0,
+      "Year Built": 1909
+    },
+    "expected_price_USD": 107710.54403090412
+  }
+]
