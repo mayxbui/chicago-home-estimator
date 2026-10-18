@@ -49,19 +49,7 @@ Try an estimate, edit an input, save a summary, and change the ZIP on the market
 python -m unittest test_website_model.py test_api.py
 ```
 
-## Deploying to Vercel
-
-The project is prepared for Vercel, but has not been deployed from this chat.
-
-1. Import the repository in Vercel.
-2. Set the **Root Directory** to `chicago-home-estimator` if it is inside a larger repository. If this folder itself is the repository root, leave the default.
-3. Select **Other** as the framework. No frontend build command is needed. `vercel.json` sets the output directory to `public`.
-4. Deploy, then test an estimate and the market page at the assigned URL.
-5. Add the verified live URL to the group's submission.
-
-No database, API keys, or additional images are needed. Static pages and the Python API run under the same website address.
-
-## Project structure
+<!-- ## Project structure
 
 - `public/index.html`: website pages and property form.
 - `public/styles.css`: responsive appearance.
@@ -70,10 +58,9 @@ No database, API keys, or additional images are needed. Static pages and the Pyt
 - `website_model.py`: the group's existing prediction calculation, unchanged by this migration.
 - `app_assets`: supplied data, exported coefficients, and settings used on the server.
 - `dev_server.py`: local preview server.
-- `vercel.json`: hosting configuration.
 
-The website uses HTML, CSS, JavaScript, and a Python Vercel Function. The requirements file contains the dependencies for this application.
+The website uses HTML, CSS, JavaScript, and a Python backend. The requirements file contains the dependencies for this application.
 
 Keep `app_assets/final_model_coefficients.csv` and `app_assets/final_model_settings.json` from the same export together. Other pickle and joblib files are not used for active estimates. Section 11 of `../04_final_model_testing.ipynb` documents the export and checks, with supporting results in `../model_artifacts/zip_log_price/`. The final holdout has been evaluated and should not be reused to select or tune revised models.
 
-Students should review the interface and documentation, make the wording their own, and record coding assistance in the notebook's AI Use Log according to the assignment policy.
+Students should review the interface and documentation, make the wording their own, and record coding assistance in the notebook's AI Use Log according to the assignment policy. -->
