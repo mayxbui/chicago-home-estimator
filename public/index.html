@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="A starting point for Chicago home pricing, with property estimates and historical sales.">
+    <title>
+      Chicago Home Estimator
+    </title>
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+    <meta name="theme-color" content="#eee6d9">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cantata+One&family=IBM+Plex+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer>
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">
+      Skip to content
+    </a>
+    <!-- Shared branding and navigation. -->
+    <header>
+      <a class="brand" href="#home">
+        <img class="brand-logo" src="/assets/logo.svg" alt="" width="48" height="48">
+        <span>
+          Chicago
+          <br>
+          <strong>
+            Home Estimator
+          </strong>
+        </span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="#home">
+          Home
+        </a>
+        <a href="#estimate">
+          Get an Estimate
+        </a>
+        <a href="#market">
+          Explore Sales
+        </a>
+        <a href="#about">
+          About
+        </a>
+      </nav>
+      <span class="prototype">
+        BUSA 310 · Student prototype
+      </span>
+    </header>
+    <main id="main">
+      <!-- Introduction and preparation guidance. -->
+      <section id="home" class="page">
+        <div class="hero">
+          <div>
+            <p class="eyebrow">
+              A HOME IN CHICAGO. A PLACE TO START.
+            </p>
+            <h1>
+              What could your home
+              <br>
+              sell for?
+            </h1>
+            <p class="lead">
+              Buying, selling, or helping a client? Tell us about the home. We’ll give you an estimate and past sales to review before your next conversation.
+            </p>
+            <a class="button" href="#estimate">
+              Estimate a Home
+              <span aria-hidden="true">
+                ↗
+              </span>
+            </a>
+            <a class="text-link" href="#market">
+              Browse local sales →
+            </a>
+            <p class="hero-note">
+              For Chicago agents and buyers · Single-family homes and townhomes
+            </p>
+          </div>
+          <aside class="hero-card">
+            <div class="hero-visual" aria-hidden="true">
+              <img id="hero-image" alt="" hidden>
+            </div>
+            <span class="eyebrow">
+              HERE’S HOW IT WORKS
+            </span>
+            <h2>
+              A few details.
+              <br>
+              A place to begin.
+            </h2>
+            <div class="step">
+              <b>
+                01
+              </b>
+              <div>
+                <h3>
+                  Describe the home
+                </h3>
+                <p>
+                  Start with its location, size, and rooms.
+                </p>
+              </div>
+            </div>
+            <div class="step">
+              <b>
+                02
+              </b>
+              <div>
+                <h3>
+                  Review your estimate
+                </h3>
+                <p>
+                  See a price based on recorded property sales.
+                </p>
+              </div>
+            </div>
+            <div class="step">
+              <b>
+                03
+              </b>
+              <div>
+                <h3>
+                  Take a closer look
+                </h3>
+                <p>
+                  Compare past sales and see what’s happening nearby.
+                </p>
+              </div>
+            </div>
+          </aside>
+        </div>
+        <div class="trust">
+          <span>
+            Cook County property records
+          </span>
+          <span>
+            Sales: Sep 2019–Aug 2026
+          </span>
+          <span>
+            See the sources and limitations
+          </span>
+        </div>
+        <div class="section-heading">
+          <p class="eyebrow">
+            BEFORE YOU BEGIN
+          </p>
+          <h2>
+            A few things to have handy.
+          </h2>
+          <p>
+            You’ll need the ZIP, recorded Assessor class, building and lot sizes, year built, and room counts. No name, email, or phone number needed.
+          </p>
+        </div>
+        <div class="notice">
+          Every home has details a model can’t see. Use the estimate alongside a review of the home’s condition and suitable recent sales before deciding on a listing price.
+        </div>
+      </section>
+      <!-- Property form and prediction results. -->
+      <section id="estimate" class="page" hidden>
+        <p class="eyebrow">
+          LET’S START WITH THE DETAILS
+        </p>
+        <h1>
+          Tell us about the home.
+        </h1>
+        <p class="lead">
+          Have the property record nearby? Use those details to fill in the form below.
+        </p>
+        <div id="loading" role="status">
+          Loading supported locations…
+        </div>
+        <form id="property-form" hidden>
+          <div class="form-layout">
+            <div>
+              <fieldset aria-labelledby="form-section-1">
+                <h2 class="form-section-title" id="form-section-1">
+                  <span>
+                    01
+                  </span>
+                  Location
+                </h2>
+                <div class="grid two">
+                  <label>
+                    ZIP code
+                    <small>
+                      Type or select a supported ZIP
+                    </small>
+                    <input name="ZIP Code" id="zip" list="zip-options" inputmode="numeric" autocomplete="off" placeholder="Type a ZIP code" required>
+                    <datalist id="zip-options">
+                    </datalist>
+                  </label>
+                  <label>
+                    Assessor neighborhood
+                    <small>
+                      Optional · filters sales only
+                    </small>
+                    <input name="Neighborhood Code" id="neighborhood" list="neighborhood-options" inputmode="numeric" autocomplete="off" placeholder="Not provided">
+                    <datalist id="neighborhood-options">
+                    </datalist>
+                  </label>
+                </div>
+              </fieldset>
+              <fieldset aria-labelledby="form-section-2">
+                <h2 class="form-section-title" id="form-section-2">
+                  <span>
+                    02
+                  </span>
+                  Building details
+                </h2>
+                <label>
+                  Recorded Assessor property class
+                  <input name="Property Class" id="property-class" list="class-options" autocomplete="off" placeholder="Type a class code or search its description" required>
+                  <datalist id="class-options">
+                  </datalist>
+                </label>
+                <details>
+                  <summary>
+                    Where do I find my property class?
+                  </summary>
+                  <p>
+                    Use the class recorded on the property's Cook County Assessor record. Do not infer it from the ZIP. The optional neighborhood code only filters sale examples.
+                  </p>
+                  <a href="https://www.cookcountyassessor.com" target="_blank" rel="noopener">
+                    Visit Cook County Assessor ↗
+                  </a>
+                </details>
+                <div class="grid three">
+                  <label>
+                    Building area (sq ft)
+                    <input name="Building Area (sq ft)" type="number" min="100" max="30000" step="1" value="1400" required>
+                    <small>
+                      Exterior measurements
+                    </small>
+                  </label>
+                  <label>
+                    Land area (sq ft)
+                    <input name="Land Area (sq ft)" type="number" min="100" max="1000000" step="1" value="3750" required>
+                  </label>
+                  <label>
+                    Year built
+                    <input name="Year Built" id="year-built" type="number" min="1600" step="1" value="1950" required>
+                  </label>
+                </div>
+              </fieldset>
+              <fieldset aria-labelledby="form-section-3">
+                <h2 class="form-section-title" id="form-section-3">
+                  <span>
+                    03
+                  </span>
+                  Rooms
+                  &
+                  bathrooms
+                </h2>
+                <div class="grid three">
+                  <label>
+                    Bedrooms
+                    <input name="Bedrooms" type="number" min="0" max="20" value="3" required>
+                  </label>
+                  <label>
+                    Full bathrooms
+                    <input name="Full Bathrooms" type="number" min="0" max="15" value="1" required>
+                  </label>
+                  <label>
+                    Half bathrooms
+                    <input name="Half Bathrooms" type="number" min="0" max="15" value="1" required>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+            <aside class="card form-aside">
+              <p class="eyebrow">
+                YOUR ESTIMATE
+              </p>
+              <h2>
+                Something to work with.
+              </h2>
+              <p>
+                See an estimated sale price, review past transactions, and save a copy for your notes.
+              </p>
+              <hr>
+              <p>
+                Estimate date
+                <br>
+                <strong id="estimate-date">
+                </strong>
+              </p>
+              <p class="muted">
+                Today's Chicago date is applied automatically. Sales data end August 11, 2026; later estimates extend the fitted trend.
+              </p>
+              <button class="button" type="submit" id="submit">
+                See My Estimate →
+              </button>
+              <p class="muted">
+                The result is a single estimate, not a verified price range for this home.
+              </p>
+            </aside>
+          </div>
+        </form>
+        <p id="form-error" class="error" role="alert" hidden>
+        </p>
+        <section id="result" hidden tabindex="-1" aria-labelledby="result-heading">
+          <div class="section-heading">
+            <p class="eyebrow">
+              READY TO REVIEW
+            </p>
+            <h2 id="result-heading">
+              Your estimate
+              &
+              supporting sales
+            </h2>
+          </div>
+          <div class="estimate-card">
+            <p>
+              Estimated sale price
+            </p>
+            <strong id="price">
+            </strong>
+            <p id="result-date">
+            </p>
+            <p>
+              A model estimate, not an appraisal or guaranteed sale price.
+            </p>
+          </div>
+          <div class="notice">
+            The supplied sales end August 11, 2026. Later estimates extend the fitted time trend; accuracy for this later period has not been established. No individual prediction interval is available.
+          </div>
+          <div class="actions">
+            <button id="edit" class="secondary">
+              ← Edit Property Details
+            </button>
+            <button id="download" class="secondary">
+              Save Summary (JSON)
+            </button>
+          </div>
+          <details>
+            <summary>
+              Review entered property details
+            </summary>
+            <dl id="property-summary">
+            </dl>
+          </details>
+          <h2>
+            Historical sales to review
+          </h2>
+          <p>
+            Matched by ZIP and optional neighborhood, then ranked by exterior building-area similarity. These are past transactions, not current listings; condition and other differences may affect comparability.
+          </p>
+          <div id="comparables" class="grid three">
+          </div>
+        </section>
+      </section>
+      <!-- Searchable market summaries, charts, and monthly table. -->
+      <section id="market" class="page" hidden>
+        <p class="eyebrow">
+          A LOOK AT LOCAL SALES
+        </p>
+        <h1>
+          What’s been selling nearby?
+        </h1>
+        <p class="lead">
+          Pick a ZIP to browse past sales, monthly prices, and transaction activity.
+        </p>
+        <label class="filter">
+          Location
+          <input id="market-zip" list="market-zip-options" inputmode="numeric" autocomplete="off" placeholder="All available ZIPs">
+          <datalist id="market-zip-options">
+          </datalist>
+          <small>
+            Type a ZIP or clear to see all locations.
+          </small>
+        </label>
+        <p id="market-status" role="status">
+        </p>
+        <div class="grid two" id="market-metrics">
+        </div>
+        <h2>
+          Monthly sales history
+        </h2>
+        <p>
+          Monthly medians reflect the homes sold, not an individual home's appreciation. The first and last months are incomplete. Months without sales have no median.
+        </p>
+        <div class="grid two" id="market-charts">
+        </div>
+        <!-- Table controls limit visible monthly records; charts retain the full timeline. -->
+        <div class="table-toolbar">
+          <label for="row-limit">Show
+            <select id="row-limit" aria-controls="market-rows">
+              <option value="10">10 rows</option>
+              <option value="20">20 rows</option>
+              <option value="50">50 rows</option>
+              <option value="100">100 rows</option>
+            </select>
+          </label>
+          <span id="row-summary" class="muted" role="status" aria-live="polite"></span>
+          <div class="table-pagination" aria-label="Monthly table pages">
+            <button id="previous-rows" class="secondary" type="button" disabled>← Newer</button>
+            <button id="next-rows" class="secondary" type="button" disabled>Older →</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>
+              Recorded monthly transactions and median prices
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">
+                  Month
+                </th>
+                <th scope="col">
+                  Transactions
+                </th>
+                <th scope="col">
+                  Median sale price
+                </th>
+              </tr>
+            </thead>
+            <tbody id="market-rows">
+            </tbody>
+          </table>
+        </div>
+        <h2>
+          Same-period comparison
+        </h2>
+        <p>
+          January 1 through the latest covered calendar date in each year.
+        </p>
+        <div class="grid two" id="market-periods">
+        </div>
+        <p class="muted">
+          Partial-year coverage and changes in the property mix limit interpretation. These are sample transactions, not active listings or total housing supply.
+        </p>
+      </section>
+      <!-- Model accuracy, data sources, and limitations. -->
+      <section id="about" class="page" hidden>
+        <p class="eyebrow">
+          BEHIND THE NUMBERS
+        </p>
+        <h1>
+          Know where your estimate comes from.
+        </h1>
+        <p class="lead">
+          We built this student project to help agents and buyers make sense of Chicago property records. Here’s what goes into the estimate and where it needs a closer look.
+        </p>
+        <div class="grid two" id="accuracy">
+        </div>
+        <h2>
+          How the estimate works
+        </h2>
+        <p>
+          The model uses building and lot area, home age, bedrooms, full and half bathrooms, property class, ZIP, and date-based features. It predicts log sale price and converts the result to dollars. The exported smearing factor is 1.0.
+        </p>
+        <h2>
+          Where the data come from
+        </h2>
+        <div class="grid three">
+          <article class="card">
+            <h3>
+              Recorded sales
+            </h3>
+            <p>
+              Cook County transaction records, September 1, 2019–August 11, 2026.
+            </p>
+            <a href="https://datacatalog.cookcountyil.gov/d/wvhk-k5uv" target="_blank" rel="noopener">
+              Sales source ↗
+            </a>
+          </article>
+          <article class="card">
+            <h3>
+              Property characteristics
+            </h3>
+            <p>
+              Assessor records describing buildings, rooms, and other property attributes.
+            </p>
+            <a href="https://datacatalog.cookcountyil.gov/d/x54s-btds" target="_blank" rel="noopener">
+              Property source ↗
+            </a>
+          </article>
+          <article class="card">
+            <h3>
+              Market context
+            </h3>
+            <p>
+              The group's research also considers mortgage rates and geographic context. These are not all inputs to the deployed model.
+            </p>
+            <a href="https://fred.stlouisfed.org/series/MORTGAGE30US" target="_blank" rel="noopener">
+              Mortgage rate source ↗
+            </a>
+          </article>
+        </div>
+        <div class="notice">
+          Average error is a performance measure across evaluated sales, not a prediction interval for a specific property. Sparse locations, missing condition details, exterior area measurements, and future market changes can affect usefulness.
+        </div>
+        <p>
+          Sale dates are recording dates and may differ from closing dates. Market summaries describe the supplied sample. The model does not establish causal price effects or an optimal asking price.
+        </p>
+      </section>
+    </main>
+    <footer>
+      <span>
+        Chicago Home Estimator · BUSA 310
+      </span>
+      <span>
+        Made for your next home-pricing conversation. Bring your judgment, too.
+      </span>
+    </footer>
+    <!-- Floating project and team links; supports mouse, touch, and keyboard. -->
+    <aside class="contact-dock" id="contact-dock" aria-label="Project and team links">
+      <div class="contact-panel" id="contact-panel" hidden>
+        <p class="eyebrow">MEET THE TEAM</p>
+        <h2>Let's connect.</h2>
+        <a href="https://github.com/seunggyukim05/chicago-home-estimator" target="_blank" rel="noopener noreferrer">
+          <span>Project on GitHub</span><span aria-hidden="true">↗</span>
+        </a>
+        <div class="contact-divider"></div>
+        <p class="muted">Team contacts · LinkedIn</p>
+        <a href="https://www.linkedin.com/in/mayxbui/" target="_blank" rel="noopener noreferrer">
+          <span>May Bui</span><span aria-hidden="true">↗</span>
+        </a>
+        <a href="https://www.linkedin.com/in/seunggyu-kim-0b8390390/" target="_blank" rel="noopener noreferrer">
+          <span>Seunggyu Kim</span><span aria-hidden="true">↗</span>
+        </a>
+        <a href="https://www.linkedin.com/in/long-pham9/" target="_blank" rel="noopener noreferrer">
+          <span>Long Pham</span><span aria-hidden="true">↗</span>
+        </a>
+      </div>
+      <button class="contact-toggle" id="contact-toggle" type="button"
+        aria-label="Project and team contacts" aria-expanded="false" aria-controls="contact-panel">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M20 11.5a8 8 0 0 1-8 8H5l-3 2v-10a9 9 0 0 1 18 0Z"/>
+          <path d="M7 10h8M7 14h5"/>
+        </svg>
+      </button>
+    </aside>
+  </body>
+</html>

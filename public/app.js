@@ -1,0 +1,420 @@
+// Find a page element by its ID.
+const $ = (id) => document.getElementById(id);
+
+// Format a dollar amount for display.
+const money = (n) => n == null ? 'No sales available' : new Intl.NumberFormat('en-US', {
+  style: 'currency', currency: 'USD', maximumFractionDigits: 0
+}).format(n);
+let config, lastResult, marketRequest = 0;
+let marketRows = [];
+let marketPage = 0;
+
+// Fetch JSON and surface a readable API error.
+async function request(url, options) {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+  return data;
+}
+
+// Add a supported value and description to a suggestion list.
+function option(select, value, label = value) {
+  const item = new Option(label, value);
+  item.label = label;
+  select.append(item);
+}
+
+// Build a reusable metric or historical-sale card.
+function card(title, value, note = '') {
+  const article = document.createElement('article');
+  article.className = 'card';
+  const heading = document.createElement('h3');
+  heading.textContent = title;
+  const number = document.createElement('strong');
+  number.className = 'metric';
+  number.textContent = value;
+  const description = document.createElement('p');
+  description.className = 'muted';
+  description.textContent = note;
+  article.append(heading, number, description);
+  return article;
+}
+
+// Draw a monthly line chart, keeping gaps where no sale-price median exists.
+function chart(rows, field, title) {
+  const article = document.createElement('article');
+  article.className = 'card chart-card';
+  const heading = document.createElement('h3');
+  heading.textContent = title;
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 480 220');
+  svg.setAttribute('role', 'img');
+  svg.setAttribute('aria-label', title + '. Full timeline shown; exact monthly values are in the table below.');
+  const maximum = Math.max(1, ...rows.map(row => row[field] || 0));
+  let segment = [];
+
+  // Finish one continuous segment without connecting across missing medians.
+  function drawSegment() {
+    if (!segment.length) return;
+    const path = document.createElementNS(ns, 'polyline');
+    path.setAttribute('points', segment.join(' '));
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#8e6541');
+    path.setAttribute('stroke-width', '2.5');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linejoin', 'round');
+    svg.append(path);
+    segment = [];
+  }
+
+  // Label the y-axis and add quiet reference lines for comparison.
+  [0, 0.5, 1].forEach(fraction => {
+    const y = 174 - fraction * 138;
+    const grid = document.createElementNS(ns, 'line');
+    grid.setAttribute('x1', '65');
+    grid.setAttribute('x2', '460');
+    grid.setAttribute('y1', y);
+    grid.setAttribute('y2', y);
+    grid.setAttribute('stroke', '#bba694');
+    grid.setAttribute('stroke-opacity', '0.35');
+    const text = document.createElementNS(ns, 'text');
+    text.setAttribute('x', '58');
+    text.setAttribute('y', y + 4);
+    text.setAttribute('text-anchor', 'end');
+    text.setAttribute('font-size', '10');
+    text.setAttribute('fill', '#75614f');
+    const value = maximum * fraction;
+    text.textContent = field === 'median'
+      ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 1 }).format(value)
+      : Math.round(value).toLocaleString();
+    svg.append(grid, text);
+  });
+
+  rows.forEach((row, index) => {
+    if (row[field] == null) {
+      drawSegment();
+      return;
+    }
+    const x = 65 + index * 395 / Math.max(1, rows.length - 1);
+    const y = 174 - row[field] / maximum * 138;
+    segment.push(x + ',' + y);
+    const dot = document.createElementNS(ns, 'circle');
+    dot.setAttribute('cx', x);
+    dot.setAttribute('cy', y);
+    dot.setAttribute('r', '3');
+    dot.setAttribute('class', 'chart-point');
+    const tip = document.createElementNS(ns, 'title');
+    tip.textContent = row.month + ': ' + (field === 'median' ? money(row[field]) : row[field] + ' sales');
+    dot.append(tip);
+    svg.append(dot);
+  });
+  drawSegment();
+  [[65, rows[0]?.month || ''], [415, rows[rows.length - 1]?.month || '']].forEach(([x, label]) => {
+    const text = document.createElementNS(ns, 'text');
+    text.setAttribute('x', x);
+    text.setAttribute('y', '202');
+    text.setAttribute('font-size', '11');
+    text.setAttribute('fill', '#75614f');
+    text.textContent = label;
+    svg.append(text);
+  });
+  article.append(heading, svg);
+  return article;
+}
+
+// Show the selected number of monthly rows and keep older months accessible.
+function renderMarketRows() {
+  const limit = Number($('row-limit').value);
+  const pages = Math.max(1, Math.ceil(marketRows.length / limit));
+  marketPage = Math.max(0, Math.min(marketPage, pages - 1));
+  const start = marketPage * limit;
+  $('market-rows').replaceChildren();
+  marketRows.slice(start, start + limit).forEach(row => {
+    const tr = document.createElement('tr');
+    [row.month, row.count.toLocaleString(), money(row.median)].forEach(value => {
+      const td = document.createElement('td');
+      td.textContent = value;
+      tr.append(td);
+    });
+    $('market-rows').append(tr);
+  });
+  $('row-summary').textContent = marketRows.length
+    ? 'Showing ' + (start + 1) + '–' + Math.min(start + limit, marketRows.length) + ' of ' + marketRows.length + ' monthly records'
+    : 'No monthly records to show';
+  $('previous-rows').disabled = marketPage === 0;
+  $('next-rows').disabled = marketPage >= pages - 1;
+}
+
+// Change table size without shortening either chart's full timeline.
+$('row-limit').addEventListener('change', () => {
+  marketPage = 0;
+  renderMarketRows();
+});
+$('previous-rows').addEventListener('click', () => {
+  marketPage--;
+  renderMarketRows();
+});
+$('next-rows').addEventListener('click', () => {
+  marketPage++;
+  renderMarketRows();
+});
+
+// Show the page named in the URL and update navigation.
+function route() {
+  const page = ['home', 'estimate', 'market', 'about'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
+  document.querySelectorAll('.page').forEach(el => {
+    el.hidden = el.id !== page;
+  });
+  document.querySelectorAll('nav a').forEach(el => {
+    if (el.hash === '#' + page) el.setAttribute('aria-current', 'page');
+    else el.removeAttribute('aria-current');
+  });
+  if (page === 'market' && config) loadMarket();
+  window.scrollTo(0, 0);
+}
+
+// Refresh neighborhood suggestions when the property ZIP changes.
+function neighborhoods() {
+  $('neighborhood-options').replaceChildren();
+  $('neighborhood').value = '';
+  (config.neighborhoods[$('zip').value.trim()] || []).forEach(code => option($('neighborhood-options'), code));
+  validateChoices();
+}
+
+// Require supported codes while allowing users to type and filter suggestions.
+function validateChoices() {
+  if (!config) return false;
+  const zip = $('zip').value.trim();
+  const neighborhood = $('neighborhood').value.trim();
+  const propertyClass = $('property-class').value.trim();
+  $('zip').setCustomValidity(config.zip_codes.includes(zip) ? '' : 'Choose a supported ZIP from the suggestions.');
+  $('neighborhood').setCustomValidity(!neighborhood || (config.neighborhoods[zip] || []).includes(neighborhood) ? '' : 'Choose a neighborhood listed for this ZIP, or leave it blank.');
+  $('property-class').setCustomValidity(Object.hasOwn(config.house_classes, propertyClass) ? '' : 'Choose a supported Assessor class code from the suggestions.');
+  return !$('zip').validationMessage && !$('neighborhood').validationMessage && !$('property-class').validationMessage;
+}
+
+// Load market summaries and ignore outdated responses.
+async function loadMarket() {
+  const requestId = ++marketRequest;
+  $('market-status').textContent = 'Loading recorded sales…';
+  marketRows = [];
+  renderMarketRows();
+  try {
+    const data = await request('/api/estimate?view=market&zip=' + encodeURIComponent($('market-zip').value.trim()));
+    if (requestId !== marketRequest) return;
+    $('market-metrics').replaceChildren(card('Recorded transactions', data.count.toLocaleString(), 'Transactions in the selected sample'), card('Median sale price', money(data.median), 'Across all covered years'));
+    $('market-rows').replaceChildren();
+    // Include gaps explicitly rather than implying that adjacent observed months are consecutive.
+    const lookup = new Map(data.months.map(row => [row.month, row]));
+    const months = [];
+    for (let year = 2019;
+         year <= 2026; year++) for (let month = 1; month <= 12; month++) {
+      const key = `${year}-${String(month).padStart(2,'0')}`;
+      if (key >= '2019-09' && key <= '2026-08') months.push(lookup.get(key) || {
+        month: key, count: 0, median: null
+      });
+    }
+    $('market-charts').replaceChildren(chart(months, 'count', 'Monthly sales activity'), chart(months, 'median', 'Monthly median sale price'));
+    marketRows = months.slice().reverse();
+    marketPage = 0;
+    renderMarketRows();
+    $('market-periods').replaceChildren(...data.periods.map(p => card(String(p.year), money(p.median), `${p.count.toLocaleString()} sales · January 1–${p.end}`)));
+    $('market-status').textContent = data.count ? 'Sales loaded. Latest month is incomplete.' : 'No recorded sales in this sample for the selected ZIP.';
+  }
+  catch (error) {
+    if (requestId===marketRequest) {
+      $('market-status').textContent = error.message;
+      $('market-metrics').replaceChildren();
+      $('market-rows').replaceChildren();
+      $('market-periods').replaceChildren();
+      $('market-charts').replaceChildren();
+    }
+  }
+}
+
+// Keep dependent suggestions and validation in sync while typing.
+$('zip').addEventListener('input', neighborhoods);
+$('neighborhood').addEventListener('input', validateChoices);
+$('property-class').addEventListener('input', validateChoices);
+
+// Load a market only once a complete supported ZIP is entered; blank means all ZIPs.
+$('market-zip').addEventListener('input', () => {
+  if (!config) return;
+  const zip = $('market-zip').value.trim();
+  const valid = !zip || config.zip_codes.includes(zip);
+  $('market-zip').setCustomValidity(valid ? '' : 'Choose a supported ZIP from the suggestions.');
+  if (valid) loadMarket();
+  else {
+    marketRequest++;
+    marketRows = [];
+    renderMarketRows();
+    $('market-status').textContent = 'Type or select a supported ZIP to update the results.';
+    ['market-metrics', 'market-charts', 'market-rows', 'market-periods'].forEach(id => $(id).replaceChildren());
+  }
+});
+
+// Submit validated property inputs and display the estimate and supporting sales.
+$('property-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!validateChoices()) {
+    event.target.reportValidity();
+    return;
+  }
+  $('form-error').hidden = true;
+  $('submit').disabled = true;
+  $('submit').textContent = 'Calculating…';
+  $('result').hidden = true;
+  try {
+    const details = Object.fromEntries(new FormData(event.target));
+    ['ZIP Code', 'Neighborhood Code', 'Property Class'].forEach(key => {
+      details[key] = details[key].trim();
+    });
+    ['Building Area (sq ft)', 'Land Area (sq ft)', 'Year Built', 'Bedrooms', 'Full Bathrooms', 'Half Bathrooms'].forEach(key => {
+      details[key] = Number(details[key]);
+    });
+    const data = await request('/api/estimate', {
+      method: 'POST', headers: {
+        'Content-Type': 'application/json'
+      }, body: JSON.stringify(details)
+    });
+    lastResult = data;
+    $('price').textContent = money(data.price);
+    $('result-date').textContent = 'Estimate date: '+data.details['Valuation Date'];
+    $('property-summary').replaceChildren();
+    Object.entries(data.details).forEach(([key, value]) => {
+      const dt = document.createElement('dt'), dd = document.createElement('dd');
+      dt.textContent = key;
+      dd.textContent = value === '' ? 'Not provided' : value;
+      $('property-summary').append(dt, dd);
+    });
+    $('comparables').replaceChildren(...data.comparables.map(sale => card(money(Number(sale.sale_price)), Number(sale.char_bldg_sf).toLocaleString()+' sq ft', `Recorded ${sale.sale_date.slice(0,10)} · ZIP ${sale.zip_code} · Neighborhood ${sale.nbhd}`)));
+    if (!data.comparables.length) {
+      const p = document.createElement('p');
+      p.textContent = 'No matching sales were found in this sample. Other comparable transactions may exist.';
+      $('comparables').append(p);
+    }
+    $('property-form').hidden = true;
+    $('result').hidden = false;
+    $('result').focus();
+    $('result').scrollIntoView( {
+      behavior: 'smooth', block: 'start'
+    });
+  }
+  catch (error) {
+    $('form-error').textContent = error.message;
+    $('form-error').hidden = false;
+  }
+  finally {
+    $('submit').disabled = false;
+    $('submit').textContent = 'See My Estimate →';
+  }
+});
+
+// Return to the form without losing entered values.
+$('edit').addEventListener('click', () => {
+  $('result').hidden = true;
+  $('property-form').hidden = false;
+  $('zip').focus();
+});
+
+// Save the latest estimate and entered details as a JSON file.
+$('download').addEventListener('click', () => {
+  if (!lastResult) return;
+  const file = new Blob([JSON.stringify( {
+    ...lastResult.details, 'Predicted Sale Price (USD)': lastResult.price, Model: lastResult.model
+  }, null, 2)], {
+    type: 'application/json'
+  });
+  const url = URL.createObjectURL(file), link = document.createElement('a');
+  link.href = url;
+  link.download = 'chicago_property_summary.json';
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+window.addEventListener('hashchange', route);
+route();
+
+// Load supported choices and model information before enabling the form.
+request('/api/estimate').then(data => {
+  config = data;
+  data.zip_codes.forEach(zip => {
+    option($('zip-options'), zip);
+    option($('market-zip-options'), zip);
+  });
+  Object.entries(data.house_classes).forEach(([code, label]) => option($('class-options'), code, code+' — '+label));
+  $('zip').value = data.zip_codes[0];
+  $('property-class').value = '203';
+  neighborhoods();
+  $('estimate-date').textContent = data.today;
+  $('year-built').max = data.today.slice(0, 4);
+  $('accuracy').replaceChildren(card('Holdout average absolute error', money(data.mae), 'Average across evaluated sales; not an individual price range'), card('Within 20% of actual sale price', (data.within20*100).toFixed(1)+'%', 'Results for the exported model and supported evaluated inputs'));
+  $('loading').hidden = true;
+  $('property-form').hidden = false;
+  if (location.hash==='#market') loadMarket();
+}).catch (error => {
+  $('loading').textContent = error.message+' Reload the page to retry.';
+  $('market-status').textContent = error.message;
+  $('accuracy').textContent = 'Accuracy information could not be loaded. Please reload.';
+});
+
+// Optional local photography; the metallic artwork remains when no image is supplied.
+const heroImage = $('hero-image');
+heroImage.addEventListener('load', () => {
+  heroImage.hidden = false;
+});
+heroImage.addEventListener('error', () => {
+  heroImage.hidden = true;
+});
+heroImage.src = '/assets/chicago-images.jpg';
+
+// Keep the contact panel state and its accessible toggle label synchronized.
+const contactDock = $('contact-dock');
+const contactToggle = $('contact-toggle');
+let contactPinned = false;
+function setContactOpen(open) {
+  $('contact-panel').hidden = !open;
+  contactToggle.setAttribute('aria-expanded', String(open));
+  contactToggle.setAttribute('aria-label', open ? 'Close project and team contacts' : 'Open project and team contacts');
+}
+
+// Reveal contacts on mouse hover without interfering with touch activation.
+contactDock.addEventListener('pointerenter', event => {
+  if (event.pointerType === 'mouse') setContactOpen(true);
+});
+contactDock.addEventListener('pointerleave', event => {
+  if (event.pointerType === 'mouse' && !contactPinned && !contactDock.contains(document.activeElement)) {
+    setContactOpen(false);
+  }
+});
+
+// Clicking or tapping pins the panel open until toggled or dismissed.
+contactToggle.addEventListener('click', () => {
+  contactPinned = !contactPinned;
+  setContactOpen(contactPinned);
+});
+
+// Keep the panel available while navigating its links with the keyboard.
+contactDock.addEventListener('focusout', event => {
+  if (!contactPinned && !contactDock.contains(event.relatedTarget) && !contactDock.matches(':hover')) {
+    setContactOpen(false);
+  }
+});
+
+// Dismiss contacts with Escape and return keyboard focus to the toggle.
+contactDock.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    contactPinned = false;
+    setContactOpen(false);
+    contactToggle.focus();
+  }
+});
+
+// Close the floating panel when a user clicks elsewhere on the page.
+document.addEventListener('pointerdown', event => {
+  if (!contactDock.contains(event.target)) {
+    contactPinned = false;
+    setContactOpen(false);
+  }
+});

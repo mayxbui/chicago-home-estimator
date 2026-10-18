@@ -1,6 +1,7 @@
 """Predict using the team's exported log-OLS coefficients, without unpickling."""
 
 import csv
+import hashlib
 import json
 import math
 from datetime import date
@@ -16,6 +17,13 @@ def predict_price(details, assets_dir):
     assets = Path(assets_dir)
     with (assets / "final_model_settings.json").open(encoding="utf-8-sig") as f:
         settings = json.load(f)
+    expected_hash = settings.get("coefficient_sha256")
+    if expected_hash:
+        actual_hash = hashlib.sha256(
+            (assets / "final_model_coefficients.csv").read_bytes()
+        ).hexdigest()
+        if actual_hash != expected_hash:
+            raise ValueError("The model coefficients and settings do not match.")
     with (assets / "final_model_coefficients.csv").open(
         encoding="utf-8-sig", newline=""
     ) as f:
