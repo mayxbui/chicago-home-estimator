@@ -44,6 +44,35 @@ st.markdown("""
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
+st.markdown(
+    '<div id="page-top"></div>',
+    unsafe_allow_html=True,
+)
+
+navigation = [
+    ("Home", "home"),
+    ("Estimate a Home", "details"),
+    ("Market Overview", "market"),
+    ("Data & Accuracy", "data"),
+]
+
+nav_columns = st.columns(4)
+
+for column, (label, destination) in zip(nav_columns, navigation):
+    with column:
+        if st.button(
+            label,
+            key=f"nav_{destination}",
+            type=(
+                "primary"
+                if st.session_state.page == destination
+                else "secondary"
+            ),
+        ):
+            st.session_state.page = destination
+            st.rerun()
+
+st.divider()
 
 # Home screen
 if st.session_state.page == "home":
@@ -85,8 +114,8 @@ if st.session_state.page == "home":
             st.rerun()
 
     st.caption(
-        "Historical price estimates · ZIP-based log-price model · "
-        "Choose a valuation date within the available data period."
+        "ZIP-based price estimates · "
+        "Today's date is applied automatically."
     )
 
     st.divider()
@@ -169,9 +198,6 @@ elif st.session_state.page == "details":
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("← Back to Home"):
-        st.session_state.page = "home"
-        st.rerun()
 
     st.caption("STEP 1 OF 2  ·  PROPERTY DETAILS → REVIEW")
     st.write("")
@@ -249,23 +275,20 @@ elif st.session_state.page == "details":
             )
 
         with date_col:
-            valuation_date = st.date_input(
-                "Valuation Date",
-                value=date.fromisoformat(
-                    saved.get("Valuation Date", "2026-08-11")
-                ),
-                min_value=date(2019, 9, 1),
-                max_value=date(2026, 8, 11),
-                help=(
-                    "Historical estimate date, limited to the supplied "
-                    "sales period. Used to calculate age, month, "
-                    "and the model's time trend."
-                ),
+            valuation_date = pd.Timestamp.now(
+                tz="America/Chicago"
+            ).date()
+
+            st.caption("ESTIMATE DATE")
+            st.write(valuation_date.strftime("%B %d, %Y"))
+
+            st.caption(
+                "Today's Chicago date is applied automatically."
             )
 
         st.caption(
-            "Building and room characteristics should describe "
-            "the property as of the selected date."
+            "Enter the property's current building "
+            "and room characteristics."
         )
 
         area_col, land_col, year_col = st.columns(3)
@@ -461,7 +484,7 @@ elif st.session_state.page == "review":
             st.caption("MODEL ESTIMATE")
 
             st.metric(
-                "Historical Sale Price Estimate",
+                "Estimated Sale Price",
                 f"${predicted_price:,.0f}",
             )
 
@@ -475,8 +498,15 @@ elif st.session_state.page == "review":
             )
 
             st.caption(
-                "ZIP-based log-price OLS model. "
-                "The estimate reflects the selected historical date."
+                "Calculated from your property's characteristics, "
+                "ZIP, and the displayed estimate date."
+            )
+
+            st.info(
+                "The supplied sales data end on August 11, 2026. "
+                "Estimates after that date extend the fitted "
+                "time trend; accuracy for this later period "
+                "has not been established."
             )
 
             st.caption(
@@ -592,7 +622,7 @@ elif st.session_state.page == "review":
             "No matching sales were found in this sample. "
             "Other comparable transactions may exist."
         )
-    if st.button("Back to Property Details"):
+    if st.button("Make Another Prediction →", type="primary"):
         st.session_state.page = "details"
         st.rerun()
 
@@ -612,9 +642,6 @@ elif st.session_state.page == "data":
         unsafe_allow_html=True,
     )
 
-    if st.button("← Back to Home"):
-        st.session_state.page = "home"
-        st.rerun()
 
     with st.container(border=True):
         st.caption("PREDICTION MODEL")
@@ -961,7 +988,15 @@ elif st.session_state.page == "market":
             "Changes reflect this sample and the mix of homes sold, "
             "not the appreciation of an individual property."
         )
-
-    if st.button("Return to Home"):
-        st.session_state.page = "home"
-        st.rerun()
+        
+st.markdown(
+    '<a href="#page-top" target="_self" '
+    'aria-label="Scroll to top" '
+    'style="position:fixed;bottom:80px;right:24px;'
+    'z-index:999;background:#0F172A;color:white;'
+    'padding:12px 18px;border-radius:30px;'
+    'text-decoration:none;font-weight:600;'
+    'box-shadow:0 4px 14px rgba(0,0,0,0.18);">'
+    '↑ Top</a>',
+    unsafe_allow_html=True,
+)

@@ -41,9 +41,12 @@ def predict_price(details, assets_dir):
     if property_class not in settings["house_classes"]:
         raise ValueError("This property class is not supported by the model.")
     valuation = date.fromisoformat(str(details["Valuation Date"]))
-    if not date(2019, 9, 1) <= valuation <= date(2026, 8, 11):
-        raise ValueError("Choose a historical date from 2019-09-01 to 2026-08-11.")
-
+    if not date(2019, 9, 1) <= valuation <= date.today():
+        raise ValueError(
+            "The estimate date must be between "
+            "2019-09-01 and today."
+        )
+    
     def number(key):
         value = float(details[key])
         if not math.isfinite(value):
