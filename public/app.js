@@ -11,7 +11,7 @@ let marketPage = 0;
 
 // Read JSON safely, including when the hosting platform returns a plain-text error.
 async function request(url, options) {
-  const response = await fetch(url, options);
+  const response = await fetch(url, { ...options, cache: 'no-store' });
   const body = await response.text();
   let data;
   try {
