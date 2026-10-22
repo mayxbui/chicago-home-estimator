@@ -29,6 +29,16 @@ Whether you are preparing for a seller meeting or reviewing a property with a bu
 
 For broader context, open **[Explore Sales](https://chicago-home-estimator.vercel.app/#market)** and search by ZIP. The charts show the available monthly history; table controls let you browse 10, 20, 50, or 100 monthly records at a time.
 
+## Explore sales on the ZIP map
+
+After getting an estimate, use the map beside the price summary. Hover over an area to see its ZIP and historical-example count, then click or tap to compare up to five sales against your home. You can also select an area using the ZIP list or use Tab and Enter on the map. **Back to my ZIP** restores the original location.
+
+Your home and estimated price stay visible as you explore. Explore Sales also includes a Chicago map: select an area to update the transaction count, median price, charts, and monthly table. The Overview below your estimate shows the entered details in two side-by-side tables on larger screens.
+
+The displayed median summarizes only the selected historical examples; it is not a revised estimate. Examples are ranked by building-area similarity and bedroom/full-bathroom differences, with newer sales breaking ties. Cross-ZIP prices are not adjusted for location or time.
+
+The map uses locally stored City of Chicago ZIP boundaries and has no map API fees or billing setup. It shows approximate areas, not individual house locations. ZIP choices are restricted to the City of Chicago boundary list; estimates additionally require a ZIP supported by the model. Areas with no available examples show an empty-state message.
+
 ## Know what the estimate covers
 
 The tool supports selected single-family residential classes and individually owned townhomes or row houses in the ZIP codes available on the site. It does not cover every property type or location.
